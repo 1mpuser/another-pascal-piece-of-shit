@@ -15,10 +15,11 @@ type
     procedure HandleEvent(var Event: TEvent); virtual;
   end;
 
+
   PTimeStaticText = ^TTimeStaticText;
   TTimeStaticText = object(TStaticText)
     hour, min, sec: integer;
-	Helper : PTimerHelper;
+	//Helper : PTimerHelper;
     constructor Init(var R: TRect; h: integer; m: integer; ss:integer);
     procedure HandleEvent(var Event: TEvent); virtual;
     function Time(i: word): string;
@@ -34,11 +35,6 @@ end;
   end;
   
 
-  
-  
-  
-  
-
 { TDemoWindow }
 constructor TDemoWindow.Init(R: TRect; WinTitle: String; WindowNo: Word);
 var s : string;
@@ -48,8 +44,8 @@ begin
   Str(WindowNo, S);
   TDialog.Init(R, WinTitle + ' ' + S);{, wnNoNumber);}
   R.Assign(6, 2, 36, 3);
-  gettime(h, m, se, ms );
-  Text :=  New(PTimeStaticText, Init(R, h,m,se));
+  GetTime(h, m, se, ms);
+  Text :=  New(PTimeStaticText, Init(R, 23, 0, 0));
   Insert(Text);
   R.Assign(6, 14, 30, 15);
   Insert(New(PButton, Init(R, '~K~hui', cmText, bfNormal)));
@@ -151,10 +147,11 @@ end;
 constructor TTimeStaticText.Init(var R: TRect; h: integer; m: integer; ss: integer);
 var
 s, s1, s2: string;
-TutuTime : TDateTime;
+TutuTime, Ime : TDateTime;
 begin
 TutuTime := StrToTime('23:59:00');
-Helper := new (PTimerHelper, Init(TutuTime));
+Ime := StrToTime('23:00');
+
 str(h:2, s);
 s:= s+':';
 str(m:2, s1);
@@ -171,6 +168,7 @@ var
 i: integer;
 h, m, ss, ms: word;
 s: string;
+TutuTime : TDateTime;
 begin
 inherited HandleEvent(Event);
 GetTime(h, m, ss, ms);

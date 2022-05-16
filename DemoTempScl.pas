@@ -1,5 +1,5 @@
 program ebanny_Cursach;
-uses Objects, Drivers, Views, Menus, App, Dialogs, CURSACH1, dos, sysutils;
+uses Objects, Drivers, Views, Menus, App, Dialogs, CURSACH1, dos, crt;
 
 const
   cmNewWin          = 101;
@@ -149,9 +149,6 @@ var
 s, s1, s2: string;
 TutuTime, Ime : TDateTime;
 begin
-TutuTime := StrToTime('23:59:00');
-Ime := StrToTime('23:00');
-
 str(h:2, s);
 s:= s+':';
 str(m:2, s1);
@@ -168,7 +165,6 @@ var
 i: integer;
 h, m, ss, ms: word;
 s: string;
-TutuTime : TDateTime;
 begin
 inherited HandleEvent(Event);
 GetTime(h, m, ss, ms);
@@ -184,8 +180,8 @@ DisposeStr(Text);
 Text:= NewStr(Time(i));
 Draw;
 clearEvent(Event);
-inc(sec);
-sleep(1000);
+dec(sec);
+delay(1000);
 GetEvent(Event);
 i:= 0;
 until (event.what = evKeyDown);
@@ -219,15 +215,15 @@ end;
 
 procedure TTimeStaticText.Check(var h: integer; var m: integer);
 begin
-if sec = 59 then
+if sec = 0 then
 begin
-sec:= 0;
-inc(m);
+sec:= 59;
+dec(m);
 end;
-if m > 59 then
+if m = 0 then
 begin
-m:= m-60;
-inc(h);
+m:= 59;
+dec(h);
 end;
 if h > 23 then
 h:= h-24;

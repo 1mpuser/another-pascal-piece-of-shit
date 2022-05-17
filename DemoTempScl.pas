@@ -9,10 +9,13 @@ const
   cmText 		= 103;
   cmCancel 		= 104;
 
-{type
+type
   DialogData = record
     InputLineData: string[128];
-  end;}
+  end;
+
+
+
 
 
 type
@@ -25,6 +28,11 @@ type
   end;
 
 
+  {PDemoInputLine = ^TDemoInputLine
+  TDemoInputLine = object (TInputLine)
+  procedure HandleEvent(var Event: TEvent); virtual;
+end; } 
+
   PDemoWindow = ^TDemoWindow;
   TDemoWindow = object(TDialog)
     Text : PTimeStaticText;
@@ -32,6 +40,30 @@ type
 	procedure HandleEvent(var Event: TEvent); virtual;
   end;
   
+var
+  DemoDialogData: DialogData;
+  
+
+{procedure TDemoInputLine.HandleEvent(var Event: TEvent);
+begin
+inherited HandleEvent(Event);
+if Event.What = evCommand then
+  begin
+    case Event.Command of
+      cmNewTime: begin
+	  message(Owner, evBroadCast, cmNewTime, nil);
+	  Writeln(DemoDialogData.InputLineData);
+	  end;
+    else
+      Exit;
+    end;
+    ClearEvent(Event);
+  end;
+end;}
+
+
+
+
 
 { TDemoWindow }
 constructor TDemoWindow.Init(R: TRect; WinTitle: String; WindowNo: Word);
@@ -39,6 +71,7 @@ var s : string;
 h, m , se , ms : Word;
 hour, min , sec : Integer;
 StatStr : TStaticText;
+Bruce: PView;
 begin
   Str(WindowNo, S);
   TDialog.Init(R, WinTitle + ' ' + S);{, wnNoNumber);}
@@ -50,21 +83,26 @@ begin
   GetTime(h, m, se, ms);
   Text :=  New(PTimeStaticText, Init(R, 0, 0, 9));
   Insert(Text);
+  R.Assign(6, 5, 20, 6);
+  Bruce := New(PInputLine, Init(R, 128));
+  Insert(Bruce);
   R.Assign(6, 8, 20, 9);
   Insert(New(PButton, Init(R, '~S~et Clock', cmText, bfDefault)));
-  R.Assign(22, 8, 30, 9);
+  R.Assign(6, 10, 20, 11);
   //Insert(New(PButton, Init(R, '~C~ancel', cmCancel, bfNormal)));
-  //Insert(New(PButton, Init(R, '~T~ime', cmNewTime, bfNormal)));
+  Insert(New(PButton, Init(R, '~T~ime', cmNewTime, bfNormal)));
 end;
 
 procedure TDemoWindow.HandleEvent(var Event: TEvent);
 begin
 inherited HandleEvent(Event);
+
 if Event.What = evCommand then
   begin
     case Event.Command of
       cmNewTime: begin
-	  //Writeln('dick');
+	  message(Owner, evBroadCast, cmNewTime, nil);
+	  Writeln(DemoDialogData.InputLineData);
 	  end;
 	  cmText: begin
 		//Writeln('worked');
@@ -77,10 +115,9 @@ if Event.What = evCommand then
     ClearEvent(Event);
   end;
 
-
 end;
 
-{ TMyApp }
+{  TMyApp  }
 
 constructor TMyApp.Init;
 begin
@@ -140,11 +177,15 @@ procedure TMyApp.NewWindow;
 var
   Window: PDemoWindow;
   R: TRect;
+  C : Word;
 begin
   Inc(WinCount);
   R.Assign(0, 0, 40, 16);
   R.Move(Random(40), Random(9));
   Window := New(PDemoWindow, Init(R, 'Demo Window', WinCount));
+  Window^.SetData(DemoDialogData);
+  C := DeskTop^.ExecView(Window);
+  if C = cmCancel then Window^.GetData(DemoDialogData);
   DeskTop^.Insert(Window);
 end;
 
@@ -154,10 +195,10 @@ var
 
 
 begin
-  {with DemoDialogData do
+  with DemoDialogData do
   begin
     InputLineData := '19:00';
-  end;}
+  end;
   MyApp.Init;
   MyApp.Run;
   MyApp.Done;

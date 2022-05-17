@@ -10,6 +10,7 @@ const
 type
 	PTimeStaticText = ^TTimeStaticText;
 	  TTimeStaticText = object(TStaticText)
+		cstHour, cstMin, cstSec : Integer;
 		hour, min, sec: integer;
 		//Helper : PTimerHelper;
 		constructor Init(var R: TRect; h: integer; m: integer; ss:integer);
@@ -34,6 +35,12 @@ s:= s+s1+':';
 str(ss:2, s2);
 s:= s+s2;
 TStaticText.Init(R, s);
+cstHour := h;
+cstMin := m;
+cstSec := ss;
+hour := h;
+min := m;
+sec := ss;
 EventMask:= EventMask or evBroadCast;
 end;
 
@@ -45,22 +52,30 @@ h, m, ss, ms: word;
 s: string;
 begin
 inherited HandleEvent(Event);
-GetTime(h, m, ss, ms);
+
+{GetTime(h, m, ss, ms);
 hour := h;
-Writeln(h);
+min := m;
+sec := ss;
+
+//Writeln(min);
+//Writeln(sec);
 min:= m;
-sec:=ss;
+sec:=ss;}
 if Event.Command = cmText then
 begin
 i:= 1;
 repeat
 //writeln('cycle works');
-
+//Writeln(cstMin);
 DisposeStr(Text);
 Text:= NewStr(Time(i));
 Draw;
 clearEvent(Event);
+if not ((hour = 0) and (min = 0) and (sec = 0)) then 
+begin
 dec(sec);
+end;
 sleep(1000);
 GetEvent(Event);
 i:= 0;
@@ -81,6 +96,7 @@ else begin
 h:=hour;
 m:=min;
 end;
+
 Check(h, m);
 str(h:2, s);
 s:= s+':';
@@ -92,7 +108,7 @@ min:= m;
 hour:= h;
 Time:=s;
 if (hour = 0) and (min = 0) and (sec = 0) then
-Time := 'Timer done!';
+Time := 'Clock done!';
 end;
 
 procedure TTimeStaticText.Check(var h: integer; var m: integer);
@@ -110,8 +126,8 @@ dec(h);
 end;
 if h > 23  then
 h:= h-24;
-if (h < 0) or (hour > 6000) then
-h:= HourOf(Now); {could be rewritten to different }
+if (h < 0) or (hour > 48) then
+h:= cstHour; {could be rewritten to different }
 end;
 
 begin

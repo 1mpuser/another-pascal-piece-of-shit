@@ -35,7 +35,7 @@ begin
   TDialog.Init(R, WinTitle + ' ' + S);{, wnNoNumber);}
   R.Assign(6, 2, 36, 3);
   GetTime(h, m, se, ms);
-  Text :=  New(PTimeStaticText, Init(R, h, m, se));
+  Text :=  New(PTimeStaticText, Init(R, 0, 0, 9));
   Insert(Text);
   R.Assign(6, 14, 30, 15);
   Insert(New(PButton, Init(R, '~K~hui', cmText, bfNormal)));
@@ -53,7 +53,7 @@ if Event.What = evCommand then
 	  Writeln('dick');
 	  end;
 	  cmText: begin
-		Writeln('worked');
+		//Writeln('worked');
 		message(Owner, evBroadCast, cmText, nil);
 	  end;
     else

@@ -7,6 +7,14 @@ const
   WinCount : integer = 0;
   cmNewTime 		= 102;
   cmText 		= 103;
+  cmCancel 		= 104;
+
+{type
+  DialogData = record
+    InputLineData: string[128];
+  end;}
+
+
 type
   TMyApp = object(TApplication)
     constructor Init;
@@ -30,17 +38,23 @@ constructor TDemoWindow.Init(R: TRect; WinTitle: String; WindowNo: Word);
 var s : string;
 h, m , se , ms : Word;
 hour, min , sec : Integer;
+StatStr : TStaticText;
 begin
   Str(WindowNo, S);
   TDialog.Init(R, WinTitle + ' ' + S);{, wnNoNumber);}
+  
+  
+  {R.Assign(6, 2, 36, 3);
+  StatStr := new (StaticText, Init(R, 'Here is ur countdown'));}
   R.Assign(6, 2, 36, 3);
   GetTime(h, m, se, ms);
   Text :=  New(PTimeStaticText, Init(R, 0, 0, 9));
   Insert(Text);
-  R.Assign(6, 14, 30, 15);
-  Insert(New(PButton, Init(R, '~K~hui', cmText, bfNormal)));
-  R.Assign(6, 4, 30, 5);
-  Insert(New(PButton, Init(R, '~T~ime', cmNewTime, bfDefault)));
+  R.Assign(6, 8, 20, 9);
+  Insert(New(PButton, Init(R, '~S~et Clock', cmText, bfDefault)));
+  R.Assign(22, 8, 30, 9);
+  //Insert(New(PButton, Init(R, '~C~ancel', cmCancel, bfNormal)));
+  //Insert(New(PButton, Init(R, '~T~ime', cmNewTime, bfNormal)));
 end;
 
 procedure TDemoWindow.HandleEvent(var Event: TEvent);
@@ -50,12 +64,13 @@ if Event.What = evCommand then
   begin
     case Event.Command of
       cmNewTime: begin
-	  Writeln('dick');
+	  //Writeln('dick');
 	  end;
 	  cmText: begin
 		//Writeln('worked');
 		message(Owner, evBroadCast, cmText, nil);
 	  end;
+	  cmCancel : Done;
     else
       Exit;
     end;
@@ -139,6 +154,10 @@ var
 
 
 begin
+  {with DemoDialogData do
+  begin
+    InputLineData := '19:00';
+  end;}
   MyApp.Init;
   MyApp.Run;
   MyApp.Done;

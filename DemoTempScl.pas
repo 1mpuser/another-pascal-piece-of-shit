@@ -1,5 +1,5 @@
 program ebanny_Cursach;
-uses Objects, Drivers, Views, Menus, App, Dialogs, CURSACH1, dos, crt;
+uses Objects, Drivers, Views, Menus, App, Dialogs, CURSACH1, dos, crt, sysutils, DateUtils;
 
 const
   cmNewWin          = 101;
@@ -45,7 +45,7 @@ begin
   TDialog.Init(R, WinTitle + ' ' + S);{, wnNoNumber);}
   R.Assign(6, 2, 36, 3);
   GetTime(h, m, se, ms);
-  Text :=  New(PTimeStaticText, Init(R, 23, 0, 0));
+  Text :=  New(PTimeStaticText, Init(R, h, m, se));
   Insert(Text);
   R.Assign(6, 14, 30, 15);
   Insert(New(PButton, Init(R, '~K~hui', cmText, bfNormal)));
@@ -169,19 +169,21 @@ begin
 inherited HandleEvent(Event);
 GetTime(h, m, ss, ms);
 hour := h;
+Writeln(h);
 min:= m;
 sec:=ss;
 if Event.Command = cmText then
 begin
 i:= 1;
-writeln('handleev works!');
 repeat
+//writeln('cycle works');
+
 DisposeStr(Text);
 Text:= NewStr(Time(i));
 Draw;
 clearEvent(Event);
 dec(sec);
-delay(1000);
+sleep(1000);
 GetEvent(Event);
 i:= 0;
 until (event.what = evKeyDown);
@@ -214,19 +216,22 @@ Time:=s;
 end;
 
 procedure TTimeStaticText.Check(var h: integer; var m: integer);
+var tmpHooour : Word;
 begin
-if sec = 0 then
+if sec = -1 then
 begin
 sec:= 59;
 dec(m);
 end;
-if m = 0 then
+if m = -1 then
 begin
 m:= 59;
 dec(h);
 end;
-if h > 23 then
+if h > 23  then
 h:= h-24;
+if h < 0 then
+h:= HourOf(Now); {could be rewritten to different }
 end;
 
 

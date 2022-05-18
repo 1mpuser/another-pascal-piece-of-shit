@@ -35,7 +35,8 @@ type
 
   PMyWindow = ^TMyWindow;
   TMyWindow = object(TWindow)
-    constructor Init(Bounds: TRect; WinTitle: String; WindowNo: Word);
+    MyInput : PInputLine;
+	constructor Init(Bounds: TRect; WinTitle: String; WindowNo: Word);
 	procedure HandleEvent(var Event: TEvent); virtual;
   end;
 
@@ -53,6 +54,7 @@ end; }
   
 var
   DemoDialogData: DialogData;
+  MyApp: TMyApp;
   
 
 {procedure TDemoInputLine.HandleEvent(var Event: TEvent);
@@ -76,15 +78,16 @@ end;}
 constructor TMyWindow.Init(Bounds: TRect; WinTitle: String; WindowNo: Word);
 var
   S: string[3];
-  Bruce: PView;
   R : TRect;
 begin
   Str(WindowNo, S);
   TWindow.Init(Bounds, WinTitle + ' ' + S, wnNoNumber);
   R.Assign(6, 5, 25, 6);
-  Bruce := New(PInputLine, Init(R, 128));
-  Insert(Bruce);
+  MyInput := New(PInputLine, Init(R, 128));
+  Insert(MyInput);
   R.Assign(6, 10, 20, 11);
+  Insert(New(PButton, Init(R, '~C~lock', cmZaglushka, bfNormal)));
+  R.Assign(22, 10, 36, 11);
   Insert(New(PButton, Init(R, '~C~ancel', cmCancel, bfDefault)));
 end;
 procedure TMyWindow.HandleEvent(var Event: TEvent);
@@ -92,6 +95,12 @@ begin
 inherited HandleEvent(Event);
 	case Event.Command of
 	  cmCancel : Done;
+	  cmZaglushka : 
+	  begin
+		MyInput^.getdata(DemoDialogData);
+		Writeln(DemoDialogData.InputLineData);
+		MyApp.NewWindow;
+	  end;
     else
       Exit;
     end;
@@ -238,8 +247,8 @@ begin
 end;
 
 
-var
-  MyApp: TMyApp;
+{var
+  MyApp: TMyApp;}
 
 
 begin

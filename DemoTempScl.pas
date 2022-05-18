@@ -8,6 +8,8 @@ const
   cmNewTime 		= 102;
   cmText 		= 103;
   cmCancel 		= 104;
+  cmMainWindow = 105;
+  cmZaglushka = 106;
 
 type
   DialogData = record
@@ -25,8 +27,17 @@ type
     procedure InitMenuBar; virtual;
     procedure NewWindow;
     procedure HandleEvent(var Event: TEvent); virtual;
+	procedure NewMainWindow;
   end;
 
+
+
+
+  PMyWindow = ^TMyWindow;
+  TMyWindow = object(TWindow)
+    constructor Init(Bounds: TRect; WinTitle: String; WindowNo: Word);
+	procedure HandleEvent(var Event: TEvent); virtual;
+  end;
 
   {PDemoInputLine = ^TDemoInputLine
   TDemoInputLine = object (TInputLine)
@@ -61,6 +72,30 @@ if Event.What = evCommand then
   end;
 end;}
 
+{   TMyWindow  }
+constructor TMyWindow.Init(Bounds: TRect; WinTitle: String; WindowNo: Word);
+var
+  S: string[3];
+  Bruce: PView;
+  R : TRect;
+begin
+  Str(WindowNo, S);
+  TWindow.Init(Bounds, WinTitle + ' ' + S, wnNoNumber);
+  R.Assign(6, 5, 25, 6);
+  Bruce := New(PInputLine, Init(R, 128));
+  Insert(Bruce);
+  R.Assign(6, 10, 20, 11);
+  Insert(New(PButton, Init(R, '~C~ancel', cmCancel, bfDefault)));
+end;
+procedure TMyWindow.HandleEvent(var Event: TEvent);
+begin
+inherited HandleEvent(Event);
+	case Event.Command of
+	  cmCancel : Done;
+    else
+      Exit;
+    end;
+end;
 
 
 
@@ -84,13 +119,13 @@ begin
   Text :=  New(PTimeStaticText, Init(R, 0, 0, 9));
   Insert(Text);
   R.Assign(6, 5, 20, 6);
-  Bruce := New(PInputLine, Init(R, 128));
+  {Bruce := New(PInputLine, Init(R, 128));
   Insert(Bruce);
-  R.Assign(6, 8, 20, 9);
+  R.Assign(6, 8, 20, 9);}
   Insert(New(PButton, Init(R, '~S~et Clock', cmText, bfDefault)));
   R.Assign(6, 10, 20, 11);
   //Insert(New(PButton, Init(R, '~C~ancel', cmCancel, bfNormal)));
-  Insert(New(PButton, Init(R, '~T~ime', cmNewTime, bfNormal)));
+  //Insert(New(PButton, Init(R, '~T~ime', cmNewTime, bfNormal)));
 end;
 
 procedure TDemoWindow.HandleEvent(var Event: TEvent);
@@ -131,6 +166,7 @@ begin
   begin
     case Event.Command of
       cmNewWin: NewWindow;
+	  cmMainWindow : NewMainWindow;
     else
       Exit;
     end;
@@ -145,7 +181,7 @@ begin
   R.B.Y := R.A.Y + 1;
   MenuBar := New(PMenuBar, Init(R, NewMenu(
     NewSubMenu('~F~ile', hcNoContext, NewMenu(
-      NewItem('~N~ew', 'F4', kbF4, cmNewWin, hcNoContext,
+      NewItem('~N~ew', 'F4', kbF4, cmMainWindow, hcNoContext,
       NewLine(
       NewItem('E~x~it', 'Alt-X', kbAltX, cmQuit, hcNoContext,
       nil)))),
@@ -186,6 +222,18 @@ begin
   Window^.SetData(DemoDialogData);
   C := DeskTop^.ExecView(Window);
   if C = cmCancel then Window^.GetData(DemoDialogData);
+  DeskTop^.Insert(Window);
+end;
+
+procedure TMyApp.NewMainWindow;
+var
+  Window: PMyWindow;
+  R: TRect;
+begin
+  Inc(WinCount);
+  R.Assign(0, 0, 50, 20);
+  R.Move(15, 5);
+  Window := New(PMyWindow, Init(R, 'Demo Window', WinCount));
   DeskTop^.Insert(Window);
 end;
 

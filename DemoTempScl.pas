@@ -91,8 +91,9 @@ begin
   Insert(New(PButton, Init(R, '~C~ancel', cmCancel, bfDefault)));
 end;
 procedure TMyWindow.HandleEvent(var Event: TEvent);
-var difTime, futTime : TDateTime;
+var difTime, futTime, nowTime, oneMoreDate : TDateTime;
 hhh, mmm, sss : integer;
+Cmp : Integer;
 begin
 inherited HandleEvent(Event);
 	case Event.Command of
@@ -101,10 +102,20 @@ inherited HandleEvent(Event);
 	  begin
 		MyInput^.getdata(DemoDialogData);
 		futTime := StrToTime(DemoDialogData.InputLineData);
-		difTime := futTime - now;
-		hhh := hourof(difTime);
-		mmm := MinuteOf(difTime);
-		sss := SecondOf(difTime);
+		nowTime := now;
+		Cmp:=CompareDateTime(futTime, nowTime);
+		if Cmp < 0 then begin
+		difTime := nowTime - futTime;
+		hhh := 24 - hourof(difTime);
+		mmm := 60 - MinuteOf(difTime);
+		sss := 60 - SecondOf(difTime);
+		end;
+		if Cmp > 0 then begin
+		difTime := futTime - nowTime;
+		hhh := 24 - hourof(difTime);
+		mmm := 60 - MinuteOf(difTime);
+		sss := 60 - SecondOf(difTime);
+		end;
 		MyApp.NewWindow(hhh, mmm, sss);
 	  end;
     else

@@ -124,7 +124,7 @@ begin
 m:= 59;
 dec(h);
 end;
-if h > 23  then
+if h > 48  then
 h:= h-24;
 if (h < 0) or (hour > 48) then
 h:= cstHour; {could be rewritten to different }

@@ -25,7 +25,7 @@ type
     constructor Init;
     procedure InitStatusLine; virtual;
     procedure InitMenuBar; virtual;
-    procedure NewWindow;
+    procedure NewWindow(serviceHour : Integer; serviceMin : Integer; serviceSec : Integer);
     procedure HandleEvent(var Event: TEvent); virtual;
 	procedure NewMainWindow;
   end;
@@ -48,7 +48,7 @@ end; }
   PDemoWindow = ^TDemoWindow;
   TDemoWindow = object(TDialog)
     Text : PTimeStaticText;
-	constructor Init(R : TRect; WinTitle: String; WindowNo: Word);
+	constructor Init(R: TRect; WinTitle: String; WindowNo: Word; sHour: integer; sMin : Integer; sSec : integer);
 	procedure HandleEvent(var Event: TEvent); virtual;
   end;
   
@@ -91,6 +91,8 @@ begin
   Insert(New(PButton, Init(R, '~C~ancel', cmCancel, bfDefault)));
 end;
 procedure TMyWindow.HandleEvent(var Event: TEvent);
+var difTime, futTime : TDateTime;
+hhh, mmm, sss : integer;
 begin
 inherited HandleEvent(Event);
 	case Event.Command of
@@ -98,8 +100,12 @@ inherited HandleEvent(Event);
 	  cmZaglushka : 
 	  begin
 		MyInput^.getdata(DemoDialogData);
-		Writeln(DemoDialogData.InputLineData);
-		MyApp.NewWindow;
+		futTime := StrToTime(DemoDialogData.InputLineData);
+		difTime := futTime - now;
+		hhh := hourof(difTime);
+		mmm := MinuteOf(difTime);
+		sss := SecondOf(difTime);
+		MyApp.NewWindow(hhh, mmm, sss);
 	  end;
     else
       Exit;
@@ -110,7 +116,7 @@ end;
 
 
 { TDemoWindow }
-constructor TDemoWindow.Init(R: TRect; WinTitle: String; WindowNo: Word);
+constructor TDemoWindow.Init(R: TRect; WinTitle: String; WindowNo: Word; sHour: integer; sMin : Integer; sSec : integer);
 var s : string;
 h, m , se , ms : Word;
 hour, min , sec : Integer;
@@ -124,8 +130,7 @@ begin
   {R.Assign(6, 2, 36, 3);
   StatStr := new (StaticText, Init(R, 'Here is ur countdown'));}
   R.Assign(6, 2, 36, 3);
-  GetTime(h, m, se, ms);
-  Text :=  New(PTimeStaticText, Init(R, 0, 0, 9));
+  Text :=  New(PTimeStaticText, Init(R, sHour, sMin, sSec));
   Insert(Text);
   R.Assign(6, 5, 20, 6);
   {Bruce := New(PInputLine, Init(R, 128));
@@ -174,7 +179,7 @@ begin
   if Event.What = evCommand then
   begin
     case Event.Command of
-      cmNewWin: NewWindow;
+      //cmNewWin: NewWindow;
 	  cmMainWindow : NewMainWindow;
     else
       Exit;
@@ -218,7 +223,7 @@ begin
   ));
 end;
 
-procedure TMyApp.NewWindow;
+procedure TMyApp.NewWindow(serviceHour : Integer; serviceMin : Integer; serviceSec : Integer);
 var
   Window: PDemoWindow;
   R: TRect;
@@ -227,7 +232,7 @@ begin
   Inc(WinCount);
   R.Assign(0, 0, 40, 16);
   R.Move(Random(40), Random(9));
-  Window := New(PDemoWindow, Init(R, 'Demo Window', WinCount));
+  Window := New(PDemoWindow, Init(R, 'Demo Window', WinCount, serviceHour, serviceMin, serviceSec));
   Window^.SetData(DemoDialogData);
   C := DeskTop^.ExecView(Window);
   if C = cmCancel then Window^.GetData(DemoDialogData);

@@ -1,6 +1,6 @@
-program ebanny_Cursach;
+program Cursach;
 
-uses TimeStaticText ,Objects, Drivers, Views, Menus, App, Dialogs, CURSACH1, dos, crt, sysutils, DateUtils;
+uses TimeStaticText, Objects, Drivers, Views, Menus, App, Dialogs, CURSACH1, dos, crt, sysutils, DateUtils;
 
 const
   cmNewWin          = 101;
@@ -15,9 +15,6 @@ type
   DialogData = record
     InputLineData: string[128];
   end;
-
-
-
 
 
 type
@@ -40,10 +37,6 @@ type
 	procedure HandleEvent(var Event: TEvent); virtual;
   end;
 
-  {PDemoInputLine = ^TDemoInputLine
-  TDemoInputLine = object (TInputLine)
-  procedure HandleEvent(var Event: TEvent); virtual;
-end; } 
 
   PDemoWindow = ^TDemoWindow;
   TDemoWindow = object(TDialog)
@@ -57,22 +50,6 @@ var
   MyApp: TMyApp;
   
 
-{procedure TDemoInputLine.HandleEvent(var Event: TEvent);
-begin
-inherited HandleEvent(Event);
-if Event.What = evCommand then
-  begin
-    case Event.Command of
-      cmNewTime: begin
-	  message(Owner, evBroadCast, cmNewTime, nil);
-	  Writeln(DemoDialogData.InputLineData);
-	  end;
-    else
-      Exit;
-    end;
-    ClearEvent(Event);
-  end;
-end;}
 
 {   TMyWindow  }
 constructor TMyWindow.Init(Bounds: TRect; WinTitle: String; WindowNo: Word);
@@ -106,7 +83,7 @@ inherited HandleEvent(Event);
 		Cmp:=CompareDateTime(futTime, nowTime);
 		if Cmp < 0 then begin
 		difTime := nowTime - futTime;
-		hhh := 24 - hourof(difTime);
+		hhh := 24 - hourof(difTime) - 1;
 		mmm := 60 - MinuteOf(difTime);
 		sss := 60 - SecondOf(difTime);
 		end;
@@ -136,21 +113,13 @@ Bruce: PView;
 begin
   Str(WindowNo, S);
   TDialog.Init(R, WinTitle + ' ' + S);{, wnNoNumber);}
-  
-  
-  {R.Assign(6, 2, 36, 3);
-  StatStr := new (StaticText, Init(R, 'Here is ur countdown'));}
   R.Assign(6, 2, 36, 3);
   Text :=  New(PTimeStaticText, Init(R, sHour, sMin, sSec));
   Insert(Text);
   R.Assign(6, 5, 20, 6);
-  {Bruce := New(PInputLine, Init(R, 128));
-  Insert(Bruce);
-  R.Assign(6, 8, 20, 9);}
   Insert(New(PButton, Init(R, '~S~et Clock', cmText, bfDefault)));
-  R.Assign(6, 10, 20, 11);
-  //Insert(New(PButton, Init(R, '~C~ancel', cmCancel, bfNormal)));
-  //Insert(New(PButton, Init(R, '~T~ime', cmNewTime, bfNormal)));
+  R.Assign(6, 7, 20, 8);
+  Insert(New(PButton, Init(R, '~C~ancel', cmCancel, bfNormal)));
 end;
 
 procedure TDemoWindow.HandleEvent(var Event: TEvent);
@@ -165,7 +134,6 @@ if Event.What = evCommand then
 	  Writeln(DemoDialogData.InputLineData);
 	  end;
 	  cmText: begin
-		//Writeln('worked');
 		message(Owner, evBroadCast, cmText, nil);
 	  end;
 	  cmCancel : Done;
@@ -190,7 +158,6 @@ begin
   if Event.What = evCommand then
   begin
     case Event.Command of
-      //cmNewWin: NewWindow;
 	  cmMainWindow : NewMainWindow;
     else
       Exit;
@@ -262,9 +229,6 @@ begin
   DeskTop^.Insert(Window);
 end;
 
-
-{var
-  MyApp: TMyApp;}
 
 
 begin
